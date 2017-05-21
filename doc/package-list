@@ -1,0 +1,7 @@
+com.movie.score.handlers
+com.movie.score.listener
+com.movie.score.mapper
+com.movie.score.model
+com.movie.score.service
+com.movie.score.test
+com.movie.score.thread

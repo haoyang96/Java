@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+
+	<!-- stdout表示打印到屏幕 -->
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %p [%c] - %m%n" />
+		</layout>
+	</appender>
+
+	<!-- File定义了磁盘上打印到什么位置，BufferedIO设置为false表示关闭缓存 -->
+	<appender name="total" class="org.apache.log4j.RollingFileAppender">
+		<param name="Threshold" value="ALL" />
+		<!-- levels this appender emits -->
+		<param name="File" value="F:/Movies_MVC.log" />
+		<param name="Append" value="true" />
+		<param name="ImmediateFlush" value="true" />
+		<param name="BufferedIO" value="false" />
+		<param name="BufferSize" value="1024" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="MaxFileSize" value="4MB" />
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%-4p] %d{yyyy-MM-dd HH:mm:ss} [%c] %n%m%n" />
+		</layout>
+	</appender>
+
+	<appender name="Async" class="org.apache.log4j.AsyncAppender">
+		<appender-ref ref="total" />
+	</appender>
+
+	<!-- 定义logger，用来确定哪些包可以打印日志 -->
+	<logger name="com.movie" additivity="true">
+		<level value="INFO" />
+		<appender-ref ref="total" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+	<!-- 定义logger，以便于查看Spring所报的WARN -->
+	<logger name="org" additivity="true">
+		<level value="WARN" />
+		<appender-ref ref="total" />
+		<appender-ref ref="stdout" />
+	</logger>
+</log4j:configuration>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.2.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<!-- 1). 数据源 : DriverManagerDataSource -->
+	<bean id="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/test?useUnicode=true&amp;useSSL=true&amp;characterEncoding=UTF-8" />
+		<property name="username" value="root" />
+		<property name="password" value="yanghao123456" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	</bean>
+
+	<!-- 2). mybatis 的SqlSession 的工厂: SqlSessionFactoryBean -->
+	<!-- dataSource:引用数据源 -->
+	<!-- typeAliasesPackage:指定实体类的包名,自动将实体类的简单类型映射成别名 -->
+	<!-- ctrl + t是查看某个接口的实现类 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="ds" />
+		<property name="typeAliasesPackage" value="com.movie.score.model" />
+		<property name="configLocation" value="classpath:conf.xml" />
+	</bean>
+
+	<!-- 3). 事务管理 : DataSourceTransactionManager -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="ds" />
+	</bean>
+
+	<!-- 4). 使用声明式事务 -->
+	<!-- 定义一个事务管理还不够,还需要将他声明出来,才可以使用 -->
+	<!-- 也可以使用面向切面,将固定的一些方法使用这个事务,而别的方法使用别的事务方式 -->
+	<tx:annotation-driven transaction-manager="txManager" />
+
+	<!-- 5).定义Mapper接口 -->
+	<bean id="movieMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.movie.score.mapper.MovieMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- 6).定义Service服务层 -->
+	<bean id="persistService" class="com.movie.score.service.PersistService">
+		<property name="movieMapper" ref="movieMapper" />
+	</bean>
+	<!-- 7).定义Service服务层 -->
+	<bean id="findService" class="com.movie.score.service.FindService">
+		<property name="movieMapper" ref="movieMapper"></property>
+	</bean>
+
+	<!-- 8.初始化Spring时启动的线程 -->
+	<bean id="jobMap" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map>
+				<entry key="memoryMonitorThread" value-ref="memoryMonitorThread" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 9.内存监控线程 -->
+	<bean id="memoryMonitorThread" class="com.movie.score.thread.MemThread">
+		<property name="movieMapper" ref="movieMapper" />
+	</bean>
+
+</beans>

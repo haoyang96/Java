@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须要和Mapper接口名字一致 -->
+<!-- id必须要和Mapper中的方法名一致 -->
+<mapper namespace="com.movie.score.mapper.MovieMapper">
+	<cache eviction="FIFO" flushInterval="10800000" size="512"
+		readOnly="true" />
+	<!-- 1.添加一部电影 -->
+	<insert id="addMovie" parameterType="MovieModel">
+		insert into
+		movie
+		(movie_name,director,actor,type_language,type_movie,district,years,keyword,movie_source,rating)
+		values
+		(#{movie_name},#{director},#{actor} ,#{type_language}
+		,#{type_movie}
+		,#{district},#{years},
+		#{keyword},#{movie_source},#{rating})
+	</insert>
+
+	<!-- 2.根据ID删除电影 -->
+	<delete id="delMovieById" parameterType="int">
+		delete from
+		movie where
+		movie_id=#{movie_id}
+	</delete>
+
+	<!-- 3.电影信息更新 -->
+	<update id="updateMovie">
+		update
+		movie set
+		type_movie=#{movieModel.type_movie},keyword=#{movieModel.keyword},movie_source=#{movieModel.movie_source},rating=#{movieModel.rating}
+		where
+		movie_id=#{id}
+	</update>
+
+	<!-- 4.根据id查找电影 -->
+	<select id="findMovieById" parameterType="int"
+		resultType="com.movie.score.model.MovieModel">
+		select * from movie where movie_id=#{movie_id}
+	</select>
+
+	<!-- 5.查找所有电影 -->
+	<select id="findMovies" resultType="com.movie.score.model.MovieModel">
+		select * from movie
+	</select>
+
+	<!-- 6.项目的内存情况记录 -->
+	<insert id="addMemory" parameterType="MemoryModel">
+		insert into
+		memory_record
+		(maxMemory,totalMemory,freeMemory)
+		values
+		(#{maxMemory},#{totalMemory},#{freeMemory} )
+	</insert>
+</mapper>
